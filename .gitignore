@@ -1,22 +1,28 @@
 # Visual Studio
 .vs/
-
-# Build folders
-Debug/
-Release/
-x64/
-x86/
-
-# CMake
-out/
-
-# User files
 *.user
 *.VC.db
 *.VC.opendb
 
-# Object files
+# Build and Output Folders
+Debug/
+Release/
+x64/
+x86/
+out/
+
+# Compiled Object files & Prerequisites
+*.d
+*.slo
+*.lo
+*.o
 *.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Linker & Executables
 *.pdb
 *.ilk
 *.exe
