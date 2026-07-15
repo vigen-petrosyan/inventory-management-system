@@ -1,0 +1,25 @@
+# Visual Studio
+.vs/
+
+# Build folders
+Debug/
+Release/
+x64/
+x86/
+
+# CMake
+out/
+
+# User files
+*.user
+*.VC.db
+*.VC.opendb
+
+# Object files
+*.obj
+*.pdb
+*.ilk
+*.exe
+
+# Logs
+*.log
