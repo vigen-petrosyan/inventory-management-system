@@ -24,4 +24,5 @@ public:
 	void setPhone(const std::string& phone);
 
 	void printDetails() const;
+	
 };

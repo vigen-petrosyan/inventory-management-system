@@ -139,7 +139,13 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="InventoryService.cpp" />
     <ClCompile Include="InventorySystem.cpp" />
+    <ClCompile Include="Supplier.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="InventoryService.h" />
+    <ClInclude Include="Supplier.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

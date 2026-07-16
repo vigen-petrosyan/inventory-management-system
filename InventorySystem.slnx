@@ -3,5 +3,5 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
-  <Project Path="InventorySystem/InventorySystem.vcxproj" />
+  <Project Path="InventorySystem/InventorySystem.vcxproj" Id="b7e12882-855b-408d-ad51-56b1ecd210a3" />
 </Solution>
