@@ -139,12 +139,16 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Category.cpp" />
     <ClCompile Include="InventoryService.cpp" />
     <ClCompile Include="InventorySystem.cpp" />
+    <ClCompile Include="Product.cpp" />
     <ClCompile Include="Supplier.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Category.h" />
     <ClInclude Include="InventoryService.h" />
+    <ClInclude Include="Product.h" />
     <ClInclude Include="Supplier.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
