@@ -1,5 +1,8 @@
 #pragma once
 #include<unordered_map>
+#include<optional>
+#include<memory>
+#include<vector>
 
 class Product;
 class Category;
@@ -9,17 +12,23 @@ class StockTransaction;
 class Inventory
 {
 private:
-	std::unordered_map<int, Product> products;
-	std::unordered_map<int, Category> categories;
-	std::unordered_map<int, Supplier> suppliers;
+	std::unordered_map<int, std::shared_ptr<Product>> products;
+	std::unordered_map<int, std::shared_ptr<Category>> categories;
+	std::unordered_map<int, std::shared_ptr<Supplier>> suppliers;
+	std::vector<StockTransaction> sessionTransactions;
 
 public:
-	Inventory(std::unordered_map<int, Product> products_, std::unordered_map<int, Category> categories_,
-		std::unordered_map<int, Supplier> suppliers_);
+	Inventory(std::unordered_map<int, std::shared_ptr<Product>> products_,
+		std::unordered_map<int, std::shared_ptr<Category>> categories_,
+		std::unordered_map<int, std::shared_ptr<Supplier>> suppliers_,
+		std::vector<StockTransaction> sessionTransactions_);	
 
-	bool addProduct(Product p);
+	bool addProduct(const std::shared_ptr<Product>& p);
+
 	bool removeProduct(int productId);
-	Product findProduct(int productId);
+
+	std::shared_ptr<Product> findProduct(int productId);
+
 	std::vector<Product> listProducts();
 	bool updateStock(int productId, int delta);
 	bool assignCategory(int productId, int categoryId);

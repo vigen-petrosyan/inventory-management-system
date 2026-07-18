@@ -24,7 +24,9 @@ public:
 
 	int getProductId() const;
 
-	void setCategory(int categoryId_);
+	void setSupplier(std::shared_ptr<Supplier> newSupplier);
+
+	void setCategory(std::shared_ptr<Category> newCategory);
 
 	void updateQuantity(int delta);
 
