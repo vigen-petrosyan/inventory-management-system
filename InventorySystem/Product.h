@@ -8,7 +8,7 @@ class Category;
 class Product
 {
 private:
-	int productId;
+	int id;
 	std::string name;
 	std::string description;
 	int quantity;
@@ -23,6 +23,32 @@ public:
 	}
 
 	int getProductId() const;
+
+	std::string getName() const;
+
+	std::string getDescription() const;
+
+	int getQuantity() const;
+
+	double getPrice() const;
+
+	int getReorderLevel() const;
+
+	int getCategoryId() const;
+
+	int getSupplierId() const;
+
+	void setId(int productId_);
+
+	void setName(std::string name_) ;
+
+	void setDescription(std::string description_) ;
+
+	void setQuantity(int quantity_);
+
+	void setPrice(double price);
+	
+	void setReorderLevel(int reorderdLevel_);
 
 	void setSupplier(std::shared_ptr<Supplier> newSupplier);
 

@@ -14,25 +14,26 @@ class DatabaseManager
 private:
 	std::string connectionString;
 	std::unique_ptr<mysqlx::Session> session;
+	std::unique_ptr<mysqlx::Schema> db;
 	
 public:
-	DatabaseManager(std::string connectionString_, std::unique_ptr<mysqlx::Session> session_);
+	DatabaseManager(std::string connectionString_, std::unique_ptr<mysqlx::Schema> db_);
 
 	bool connect();
-
 	void disconnect();
 
-	bool saveProduct(Product p);
 
-	std::shared_ptr<Product> loadProduct(int productId);
+	std::shared_ptr<Category> loadCategory(int id_);
+	std::shared_ptr<Supplier> loadSupplier(int id_);
+	std::shared_ptr<Product> loadProduct(int id_);
 
-	bool saveCategory(Category c);
+	void saveCategory(const Category& c);
+	void saveSupplier(const Supplier& s);
+	void saveProduct(const Product& p);
 
-	bool saveSupplier(Supplier s);
+	std::vector<std::shared_ptr<Product>> loadAllProducts();
 
-	std::vector<Product> loadAllProducts();
-
-	bool saveTransaction(StockTransaction tx);
+	void saveTransaction(const StockTransaction& tx);
 
 
 };
