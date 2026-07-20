@@ -18,9 +18,9 @@ private:
 	std::shared_ptr<Supplier> supplier;
 
 public:
-	Product(int productId_, std::string name_, std::string description_,
-		int quantity_, double price_, int reorderLevel_) {
-	}
+	Product(int id_, std::string name_, std::string description_,
+		int quantity_, double price_, int reorderLevel_,
+		std::shared_ptr<Category> category_, std::shared_ptr<Supplier> supplier_);
 
 	int getProductId() const;
 

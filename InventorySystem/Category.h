@@ -9,7 +9,7 @@ private:
 	std::string description;
 
 public:
-	Category(int id_, std::string name_, std::string description_){}
+	Category(int id_, std::string name_, std::string description_);
 
 	int getId() const;
 

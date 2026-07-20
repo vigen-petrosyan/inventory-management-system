@@ -17,7 +17,7 @@ private:
 	std::unique_ptr<mysqlx::Schema> db;
 	
 public:
-	DatabaseManager(std::string connectionString_, std::unique_ptr<mysqlx::Schema> db_);
+	DatabaseManager(std::string connectionString_);
 
 	bool connect();
 	void disconnect();
@@ -30,9 +30,12 @@ public:
 	void saveCategory(const Category& c);
 	void saveSupplier(const Supplier& s);
 	void saveProduct(const Product& p);
+	void updateProductStock(int id, int delta);
 
 	std::vector<std::shared_ptr<Product>> loadAllProducts();
-
+	std::vector<std::shared_ptr<Category>> loadAllCategories();
+	std::vector<std::shared_ptr<Supplier>> loadAllSuppliers();
+	std::vector<StockTransaction> loadAllTransactions();
 	void saveTransaction(const StockTransaction& tx);
 
 

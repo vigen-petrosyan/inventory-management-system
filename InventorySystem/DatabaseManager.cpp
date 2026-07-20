@@ -5,7 +5,7 @@
 #include "Supplier.h"
 #include "StockTransaction.h"
 
-DatabaseManager::DatabaseManager(std::string connectionString_, std::unique_ptr<mysqlx::Schema> db_)
+DatabaseManager::DatabaseManager(std::string connectionString_)
 	:connectionString(connectionString_),db(nullptr), session(nullptr){ }
 
 bool DatabaseManager::connect()
@@ -13,13 +13,13 @@ bool DatabaseManager::connect()
     try
     {
         session = std::make_unique<mysqlx::Session>(connectionString);
-        db = std::make_unique<mysqlx::Schema>(session->getSchema("UniversitySystem"));
+        db = std::make_unique<mysqlx::Schema>(session->getSchema("InventorySystem"));
         return true;
     }
     catch (const mysqlx::Error& e)
     {
         std::cerr << "Database connection failed " << e.what() << '\n';
-        exit(1);
+        return false;
     }
 }
 void DatabaseManager::disconnect()
@@ -45,15 +45,13 @@ std::shared_ptr<Category> DatabaseManager::loadCategory(int id_)
 {
     try
     {
-        mysqlx::SqlResult result = session->sql("SELECT name, description FROM category WHERE category_id = ?").
+        mysqlx::SqlResult result = session->sql("SELECT name, description FROM category WHERE id = ?").
             bind(id_).execute();
 
         auto row = result.fetchOne();
+        if (!row) { return nullptr; }
 
-        auto category = std::make_shared<Category>();
-        category->setId(id_);
-        category->setName(row[0].get<std::string>());
-        category->setDescription(row[1].get<std::string>());
+        auto category = std::make_shared<Category>(id_, row[0].get<std::string>(), row[1].get<std::string>());
 
         return category;
 
@@ -72,13 +70,10 @@ std::shared_ptr<Supplier> DatabaseManager::loadSupplier(int id_)
             "WHERE id = ?").bind(id_).execute();
 
         auto row = result.fetchOne();
+        if (!row) { return nullptr; }
 
-        auto supplier = std::make_shared<Supplier>();
-        supplier->setId(id_);
-        supplier->setName(row[0].get<std::string>());
-        supplier->setContactEmail(row[1].get<std::string>());
-        supplier->setPhone(row[2].get<std::string>());
-        supplier->setAddress(row[3].get<std::string>());
+        auto supplier = std::make_shared<Supplier>(id_, row[0].get<std::string>(), row[1].get<std::string>(),
+            row[2].get<std::string>(), row[3].get<std::string>());
 
         return supplier;
 
@@ -94,7 +89,7 @@ std::shared_ptr<Product> DatabaseManager::loadProduct(int id_)
 
     try
     {
-        mysqlx::SqlResult result = session->sql("SELECT name,description,quantity,price,reorderd_level,"
+        mysqlx::SqlResult result = session->sql("SELECT name,description,quantity,price,reorder_level,"
             "category_id,supplier_id FROM products where products_id = ? ").bind(id_).execute();
 
         mysqlx::Row row = result.fetchOne();
@@ -102,15 +97,9 @@ std::shared_ptr<Product> DatabaseManager::loadProduct(int id_)
 
 
 
-        auto product = std::make_shared<Product>();
-
-        product->setName(row[0].get<std::string>());
-        product->setDescription(row[1].get<std::string>());
-        product->setQuantity(row[2].get<int>());
-        product->setPrice(row[3].get<double>());
-        product->setReorderLevel(row[4].get<int>());
-        product->setCategory(loadCategory(row[5].get<int>()));
-        product->setSupplier(loadSupplier(row[6].get<int>()));
+        auto product = std::make_shared<Product>(id_,row[0].get<std::string>(), row[1].get<std::string>(),
+            row[2].get<int>(), row[3].get<double>(), row[4].get<int>(), loadCategory(row[5].get<int>()),
+            loadSupplier(row[6].get<int>()));
 
         return product;
     }
@@ -126,25 +115,16 @@ std::vector<std::shared_ptr<Product>> DatabaseManager::loadAllProducts()
     {
         mysqlx::RowResult rows = session->sql(
             "SELECT id, name, description, quantity, price, reorder_level, category_id, supplier_id "
-            "FROM products"
+            " FROM products"
         ).execute();
 
         std::vector<std::shared_ptr<Product>> allProducts;
 
         for (mysqlx::Row row : rows)
         {
-            auto product = std::make_shared<Product>();
-
-            product->setId(row[0].get<int>());
-            product->setName(row[1].get<std::string>());
-            product->setDescription(row[2].get<std::string>());
-            product->setQuantity(row[3].get<int>());
-            product->setPrice(row[4].get<double>());
-            product->setReorderLevel(row[5].get<int>());
-
-            product->setCategory(loadCategory(row[6].get<int>()));
-            product->setSupplier(loadSupplier(row[7].get<int>()));
-
+            auto product = std::make_shared<Product>(row[0].get<int>(),row[1].get<std::string>(), row[2].get<std::string>(),
+                row[3].get<int>(), row[4].get<double>(), row[5].get<int>(), loadCategory(row[6].get<int>()),
+                loadSupplier(row[7].get<int>()));
             allProducts.push_back(product);
         }
 
@@ -175,7 +155,7 @@ void DatabaseManager::saveSupplier(const Supplier& s)
 {
     try
     {
-        session->sql("INSERT INTO supplier VALUES(id,name,contact_email,phone,address)")
+        session->sql("INSERT INTO supplier (id,name,contact_email,phone,address)  VALUES(?,?,?,?,?)")
             .bind(s.getId(), s.getName(), s.getContactEmail(), s.getPhone(), s.getAddress())
             .execute();
     }
@@ -190,7 +170,7 @@ void DatabaseManager::saveProduct(const Product& p)
     try
     {
         session->sql("INSERT INTO products (product_id, name, description, quantity,"
-            "price, reorder_level, category_id, supplier_id)VALUES(? , ? , ? , ? , ? , ? , ? , ? ").
+            "price, reorder_level, category_id, supplier_id)VALUES(? , ? , ? , ? , ? , ? , ? , ? )").
             bind(p.getProductId(), p.getName(), p.getDescription(), p.getQuantity(), p.getPrice(),
                 p.getReorderLevel(), p.getCategoryId(), p.getSupplierId()).execute();
 
@@ -217,5 +197,52 @@ void DatabaseManager::saveTransaction(const StockTransaction& tx)
         throw std::runtime_error("Error during saving transaction " + std::string(error.what()));
     }
 }
+void DatabaseManager::updateProductStock(int id, int delta)
+{
+    try
+    {
+        session->sql("UPDATE products SET quantity = quantity + ? WHERE id = ?")
+            .bind(delta, id).execute();
+    }
+
+    catch (const mysqlx::Error& error)
+    {
+        throw std::runtime_error("error during updating stock " + std::string(error.what()));
+    }
+}
+
+
+std::vector<std::shared_ptr<Category>> DatabaseManager::loadAllCategories() {
+    std::vector<std::shared_ptr<Category>> result;
+    auto rows = db->getTable("category").select().execute();
+    for (auto row : rows) {
+        result.push_back(std::make_shared<Category>(
+            row[0].get<int>(), row[1].get<std::string>(), row[2].get<std::string>()));
+        
+    }
+    return result;
+}
+
+std::vector<std::shared_ptr<Supplier>> DatabaseManager::loadAllSuppliers() {
+    std::vector<std::shared_ptr<Supplier>> result;
+    auto rows = db->getTable("Suppliers").select().execute();
+    for (auto row : rows) {
+        result.push_back(std::make_shared<Supplier>(
+            row[0].get<int>(), row[1].get<std::string>(), row[2].get<std::string>(), row[3].get<std::string>(), row[4].get<std::string>()));
+        
+    }
+    return result;
+}
+
+std::vector<StockTransaction> DatabaseManager::loadAllTransactions() {
+    std::vector<StockTransaction> result;
+    auto rows = db->getTable("transactions").select().execute();
+    for (auto row : rows) {
+        result.emplace_back(row[0].get<int>(), row[1].get<int>(), row[2].get<time_t>(), row[3].get<int>(), row[4].get<std::string>(), row[5].get<std::string>());
+    }
+    return result;
+}
+
+
 
 

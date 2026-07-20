@@ -2,11 +2,11 @@
 #include<unordered_map>
 #include<memory>
 #include<vector>
-
+#include "StockTransaction.h"
 class Product;
 class Category;
 class Supplier;
-class StockTransaction; 
+
 
 class Inventory
 {
@@ -33,4 +33,9 @@ public:
 	bool assignCategory(int productId, int categoryId);
 	bool assignSupplier(int productId, int supplierId);
 	void recordTransaction(const StockTransaction& tx);
+
+	bool addCategory(const std::shared_ptr<Category>& c);
+	bool addSupplier(const std::shared_ptr<Supplier>& s);
+
+	const std::unordered_map<int, std::shared_ptr<Product>>& getProducts() const;
 };
