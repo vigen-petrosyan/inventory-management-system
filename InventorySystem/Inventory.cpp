@@ -13,7 +13,16 @@ Inventory::Inventory(std::unordered_map<int, std::shared_ptr<Product>> products_
 	suppliers(std::move(suppliers_)),
 		sessionTransactions(sessionTransactions_){ }
 
-
+bool Inventory::addCategory(const std::shared_ptr<Category>& c) {
+	if (!c || categories.find(c->getId()) != categories.end()) return false;
+	categories[c->getId()] = c;
+	return true;
+}
+bool Inventory::addSupplier(const std::shared_ptr<Supplier>& s) {
+	if (!s || suppliers.find(s->getId()) != suppliers.end()) return false;
+	suppliers[s->getId()] = s;
+	return true;
+}
 bool Inventory::addProduct(const std::shared_ptr<Product>& p)
 {
 	int id = p->getProductId();
@@ -23,6 +32,10 @@ bool Inventory::addProduct(const std::shared_ptr<Product>& p)
 	products[id] = p;
 	return true;
 }
+const std::unordered_map<int, std::shared_ptr<Product>>& Inventory::getProducts() const {
+	return products;
+}
+
 bool Inventory::removeProduct(int productId)
 {
 	auto it = products.find(productId);
@@ -54,18 +67,6 @@ std::vector<Product> Inventory::listProducts()
 
 	return listProducts;
 }
-const std::unordered_map<int, std::shared_ptr<Product>>& Inventory::getProducts() const {
-	return products;
-}
-
-bool Inventory::updateStock(int productId, int delta)
-{
-	auto it = products.find(productId);
-	if (it == products.end()) { return false; }
-	it->second->updateQuantity(delta);
-	return true;
-}
-
 
 
 bool Inventory::assignSupplier(int productId, int supplierId)
@@ -84,7 +85,6 @@ bool Inventory::assignSupplier(int productId, int supplierId)
 
 	return true;
 }
-
 bool Inventory::assignCategory(int productId, int categoryId)
 {
 	auto prodIt = products.find(productId);
@@ -103,16 +103,13 @@ void Inventory::recordTransaction(const StockTransaction& tx)
 	sessionTransactions.push_back(tx);
 }
 
-bool Inventory::addCategory(const std::shared_ptr<Category>& c) {
-	if (!c || categories.find(c->getId()) != categories.end()) return false;
-	categories[c->getId()] = c;
-	return true;
-}
-bool Inventory::addSupplier(const std::shared_ptr<Supplier>& s) {
-	if (!s || suppliers.find(s->getId()) != suppliers.end()) return false;
-	suppliers[s->getId()] = s;
-	return true;
-}
 
+bool Inventory::updateStock(int productId, int delta)
+{
+	auto it = products.find(productId);
+	if (it == products.end()) { return false; }
+	it->second->updateQuantity(delta);
+	return true;
+}
 
 

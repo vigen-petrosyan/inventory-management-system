@@ -20,6 +20,7 @@ void InventoryService::addNewProduct(const std::shared_ptr<Product>& product) {
         throw std::runtime_error("error addNewProduct" + std::string(e.what()));
     }
 }
+
 void InventoryService::updateProductStock(int id, int delta, const std::string& note) {
     inventory.updateStock(id, delta);
 

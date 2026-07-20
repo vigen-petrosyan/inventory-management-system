@@ -27,16 +27,17 @@ public:
 	std::shared_ptr<Supplier> loadSupplier(int id_);
 	std::shared_ptr<Product> loadProduct(int id_);
 
+
 	void saveCategory(const Category& c);
 	void saveSupplier(const Supplier& s);
 	void saveProduct(const Product& p);
 	void updateProductStock(int id, int delta);
+
 
 	std::vector<std::shared_ptr<Product>> loadAllProducts();
 	std::vector<std::shared_ptr<Category>> loadAllCategories();
 	std::vector<std::shared_ptr<Supplier>> loadAllSuppliers();
 	std::vector<StockTransaction> loadAllTransactions();
 	void saveTransaction(const StockTransaction& tx);
-
 
 };

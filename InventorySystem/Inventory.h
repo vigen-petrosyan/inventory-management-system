@@ -23,12 +23,11 @@ public:
 		std::vector<StockTransaction> sessionTransactions_);	
 
 	bool addProduct(const std::shared_ptr<Product>& p);
-
 	bool removeProduct(int productId);
-
 	std::shared_ptr<Product> findProduct(int productId);
-
 	std::vector<Product> listProducts();
+	const std::unordered_map<int, std::shared_ptr<Product>>& getProducts() const;
+
 	bool updateStock(int productId, int delta);
 	bool assignCategory(int productId, int categoryId);
 	bool assignSupplier(int productId, int supplierId);
@@ -37,5 +36,4 @@ public:
 	bool addCategory(const std::shared_ptr<Category>& c);
 	bool addSupplier(const std::shared_ptr<Supplier>& s);
 
-	const std::unordered_map<int, std::shared_ptr<Product>>& getProducts() const;
 };

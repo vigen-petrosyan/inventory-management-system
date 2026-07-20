@@ -6,7 +6,7 @@
 #include "StockTransaction.h"
 
 DatabaseManager::DatabaseManager(std::string connectionString_)
-	:connectionString(connectionString_),db(nullptr), session(nullptr){ }
+	:connectionString(connectionString_), session(nullptr), db(nullptr){ }
 
 bool DatabaseManager::connect()
 {
@@ -222,10 +222,9 @@ std::vector<std::shared_ptr<Category>> DatabaseManager::loadAllCategories() {
     }
     return result;
 }
-
 std::vector<std::shared_ptr<Supplier>> DatabaseManager::loadAllSuppliers() {
     std::vector<std::shared_ptr<Supplier>> result;
-    auto rows = db->getTable("Suppliers").select().execute();
+    auto rows = db->getTable("supplier").select().execute();
     for (auto row : rows) {
         result.push_back(std::make_shared<Supplier>(
             row[0].get<int>(), row[1].get<std::string>(), row[2].get<std::string>(), row[3].get<std::string>(), row[4].get<std::string>()));
@@ -233,7 +232,6 @@ std::vector<std::shared_ptr<Supplier>> DatabaseManager::loadAllSuppliers() {
     }
     return result;
 }
-
 std::vector<StockTransaction> DatabaseManager::loadAllTransactions() {
     std::vector<StockTransaction> result;
     auto rows = db->getTable("transactions").select().execute();
@@ -242,7 +240,3 @@ std::vector<StockTransaction> DatabaseManager::loadAllTransactions() {
     }
     return result;
 }
-
-
-
-

@@ -17,5 +17,4 @@ public:
 
 	std::vector<std::shared_ptr<Product>> generateReorderList() const;
 	void loadFromDatabase();
-
 };
